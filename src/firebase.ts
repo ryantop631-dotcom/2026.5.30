@@ -97,32 +97,82 @@ if (db) {
 }
 
 /**
- * Image upload logic using Firebase Storage SDK
- * Avoids direct REST API endpoints to bypass CORS hurdles and maintains safety.
+ * Image upload logic - first tries Firebase Storage SDK, 
+ * and falls back gracefully to compressed Base64 Data URL if Storage fails (e.g. CORS/Not provisioned issues)
  */
 export function uploadImageToStorage(
   file: File, 
   folder: string,
   onProgress?: (progress: number) => void
 ): Promise<string> {
+  // Compression helper to convert image to under-the-limit compressed Base64 URL
+  const compressFile = (): Promise<string> => {
+    return new Promise((resolveCompressed, rejectCompressed) => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          
+          // Downsize automatically if dimension exceeds optimal bento boundaries
+          const maxDimension = 800;
+          if (width > maxDimension || height > maxDimension) {
+            if (width > height) {
+              height = Math.round((height * maxDimension) / width);
+              width = maxDimension;
+            } else {
+              width = Math.round((width * maxDimension) / height);
+              height = maxDimension;
+            }
+          }
+          
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            resolveCompressed(event.target?.result as string);
+            return;
+          }
+          
+          ctx.drawImage(img, 0, 0, width, height);
+          // High-efficiency JPEG compression (0.7) guarantees fits nicely inside 1MB Firestore doc limits
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+          resolveCompressed(dataUrl);
+        };
+        img.onerror = () => {
+          rejectCompressed(new Error("이미지를 읽어올 수 없습니다."));
+        };
+        img.src = event.target?.result as string;
+      };
+      reader.onerror = () => {
+        rejectCompressed(new Error("파일을 읽는 도중 에러가 발생했습니다."));
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
   return new Promise((resolve, reject) => {
-    if (!storage) {
-      reject(new Error("Firebase Storage is not initialized or configured."));
-      return;
-    }
-
-    // Restrict files that are too large (e.g., > 10MB) or not images as requested in instructions
     if (!file.type.startsWith('image/')) {
-      reject(new Error("Only image files are allowed."));
-      return;
-    }
-    const maxSizeBytes = 10 * 1024 * 1024; // 10MB
-    if (file.size > maxSizeBytes) {
-      reject(new Error("File size must be less than 10MB."));
+      reject(new Error("이미지 파일 형식만 지원합니다."));
       return;
     }
 
-    // Create a unique file name
+    const maxSizeBytes = 10 * 1024 * 1024; // 10MB limit for source
+    if (file.size > maxSizeBytes) {
+      reject(new Error("파일 용량은 10MB 이하여야 합니다."));
+      return;
+    }
+
+    // If Storage is not ready, fall back directly to compressed base64
+    if (!storage) {
+      console.info("Firebase Storage not available. Falling back to compressed base64...");
+      compressFile().then(resolve).catch(reject);
+      return;
+    }
+
+    // Try Cloud storage first
     const timestamp = Date.now();
     const cleanFileName = file.name.replace(/[^a-zA-Z0-9.]/g, "_");
     const filePath = `${folder}/${timestamp}_${cleanFileName}`;
@@ -139,15 +189,17 @@ export function uploadImageToStorage(
         }
       },
       (error) => {
-        console.error("Storage upload failed:", error);
-        reject(error);
+        console.warn("Storage upload failed (CORS or config issue). Falling back to optimized Base64...", error);
+        if (onProgress) onProgress(100);
+        compressFile().then(resolve).catch(reject);
       },
       async () => {
         try {
           const downloadUrl = await getDownloadURL(uploadTask.snapshot.ref);
           resolve(downloadUrl);
         } catch (err) {
-          reject(err);
+          console.warn("Failed to retrieve image URL. Falling back to optimized Base64...", err);
+          compressFile().then(resolve).catch(reject);
         }
       }
     );
