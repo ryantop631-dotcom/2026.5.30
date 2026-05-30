@@ -1,11 +1,12 @@
-import { ShieldAlert, LogOut, CheckCircle2, RotateCw } from 'lucide-react';
+import { ShieldAlert, LogOut, CheckCircle2, RotateCw, KeyRound } from 'lucide-react';
 
 interface AdminBarProps {
   isConfigured: boolean;
   onExit: () => void;
+  onChangePassword: () => void;
 }
 
-export default function AdminBar({ isConfigured, onExit }: AdminBarProps) {
+export default function AdminBar({ isConfigured, onExit, onChangePassword }: AdminBarProps) {
   return (
     <div 
       id="admin-status-bar" 
@@ -43,6 +44,14 @@ export default function AdminBar({ isConfigured, onExit }: AdminBarProps) {
         <div className="hidden lg:flex items-center space-x-1.5 text-xs text-gray-400 font-label-mono max-w-sm truncate">
           <span>* 데스크톱, 모바일, 모든 브라우저에 실시간으로 자동 연동됩니다.</span>
         </div>
+        <button
+          id="change-admin-password-btn"
+          onClick={onChangePassword}
+          className="flex items-center space-x-1.5 py-1.5 px-3 rounded bg-white/10 hover:bg-[#0052FF] hover:text-white text-xs font-semibold text-gray-300 transition-all font-title-md outline-none"
+        >
+          <KeyRound size={13} />
+          <span>비밀번호 변경</span>
+        </button>
         <button
           id="exit-admin-mode-btn"
           onClick={onExit}

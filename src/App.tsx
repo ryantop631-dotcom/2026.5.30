@@ -47,6 +47,7 @@ import {
 
 import AdminBar from './components/AdminBar';
 import PasswordModal from './components/PasswordModal';
+import ChangePasswordModal from './components/ChangePasswordModal';
 import { 
   EditSiteContentModal, 
   EditExperienceModal, 
@@ -58,6 +59,7 @@ export default function App() {
   // Administrative state
   const [isAdminActive, setIsAdminActive] = useState<boolean>(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState<boolean>(false);
+  const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState<boolean>(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
 
   // Core Data States
@@ -336,6 +338,7 @@ export default function App() {
         <AdminBar 
           isConfigured={isFirebaseConfigured} 
           onExit={exitAdminMode} 
+          onChangePassword={() => setIsChangePasswordModalOpen(true)}
         />
       )}
 
@@ -770,6 +773,11 @@ export default function App() {
         isOpen={isPasswordModalOpen} 
         onClose={() => setIsPasswordModalOpen(false)} 
         onSuccess={enterAdminMode} 
+      />
+
+      <ChangePasswordModal 
+        isOpen={isChangePasswordModalOpen}
+        onClose={() => setIsChangePasswordModalOpen(false)}
       />
 
       <EditSiteContentModal 

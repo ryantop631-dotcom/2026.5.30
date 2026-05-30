@@ -15,7 +15,8 @@ export default function PasswordModal({ isOpen, onClose, onSuccess }: PasswordMo
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === '1234') {
+    const currentPassword = localStorage.getItem('admin_password') || '6363';
+    if (password === currentPassword) {
       onSuccess();
       setPassword('');
       setErrorWord('');
@@ -58,7 +59,7 @@ export default function PasswordModal({ isOpen, onClose, onSuccess }: PasswordMo
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <div>
             <label className="block text-xs font-bold text-gray-700 uppercase tracking-widest mb-1.5 font-label-sm">
-              PASSWORD (기본값: 1234)
+              PASSWORD
             </label>
             <input 
               id="admin-password-input"
