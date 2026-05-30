@@ -1,0 +1,85 @@
+{
+  "entities": {
+    "SiteContent": {
+      "title": "SiteContent",
+      "description": "General text assets and landing page configs",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "subtitle": { "type": "string" },
+        "description": { "type": "string" },
+        "missionStatement": { "type": "string" },
+        "heroImageUrl": { "type": "string" },
+        "skillsTitle": { "type": "string" },
+        "skillsSubtitle": { "type": "string" },
+        "skills": { "type": "array" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "subtitle", "description", "missionStatement", "heroImageUrl"]
+    },
+    "Experience": {
+      "title": "Experience",
+      "description": "An experience card in the engineering timeline",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "icon": { "type": "string" },
+        "color": { "type": "string", "enum": ["blue", "red", "yellow"] },
+        "sortOrder": { "type": "integer" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "title", "description", "icon", "color", "sortOrder"]
+    },
+    "Certification": {
+      "title": "Certification",
+      "description": "A certification or award achieved",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "result": { "type": "string" },
+        "icon": { "type": "string" },
+        "color": { "type": "string", "enum": ["tertiary", "default"] },
+        "sortOrder": { "type": "integer" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "title", "result", "icon", "color", "sortOrder"]
+    },
+    "PortfolioItem": {
+      "title": "PortfolioItem",
+      "description": "A showcase of robotic or software portfolios",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "status": { "type": "string", "enum": ["COMPLETED", "IN DEVELOPMENT"] },
+        "tags": { "type": "array" },
+        "sortOrder": { "type": "integer" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "title", "description", "imageUrl", "status", "tags", "sortOrder"]
+    }
+  },
+  "firestore": {
+    "/siteContent/{docId}": {
+      "schema": "SiteContent",
+      "description": "General text configuration where docId is 'main'"
+    },
+    "/experiences/{experienceId}": {
+      "schema": "Experience",
+      "description": "Engineering experiences timeline items"
+    },
+    "/certifications/{certificationId}": {
+      "schema": "Certification",
+      "description": "Awards and certifications received"
+    },
+    "/portfolio/{portfolioId}": {
+      "schema": "PortfolioItem",
+      "description": "Showcase of crafted robots with tags, status, and images"
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "Robot Coding Area",
+  "description": "Kim Ju-won's robotic engineering and coding portfolio with real-time editing powered by Firebase",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

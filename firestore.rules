@@ -1,0 +1,90 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Default-deny catch-all rule
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper: Checks if document ID meets size and character rules
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // Helper: Validates a map represents SiteContent schema
+    function isValidSiteContent(data) {
+      return data.keys().hasAll(['title', 'subtitle', 'description', 'missionStatement', 'heroImageUrl', 'skillsTitle', 'skillsSubtitle', 'skills']) 
+        && data.keys().size() <= 10
+        && data.title is string && data.title.size() <= 200
+        && data.subtitle is string && data.subtitle.size() <= 200
+        && data.description is string && data.description.size() <= 3000
+        && data.missionStatement is string && data.missionStatement.size() <= 1000
+        && data.heroImageUrl is string && data.heroImageUrl.size() <= 2000
+        && data.skillsTitle is string && data.skillsTitle.size() <= 200
+        && data.skillsSubtitle is string && data.skillsSubtitle.size() <= 500
+        && data.skills is list && data.skills.size() <= 50;
+    }
+
+    // Helper: Validates an Experience document
+    function isValidExperience(data) {
+      return data.keys().hasAll(['id', 'title', 'description', 'icon', 'color', 'sortOrder'])
+        && data.keys().size() <= 8
+        && data.id is string && isValidId(data.id)
+        && data.title is string && data.title.size() <= 200
+        && data.description is string && data.description.size() <= 1000
+        && data.icon is string && data.icon.size() <= 100
+        && data.color is string && (data.color == 'blue' || data.color == 'red' || data.color == 'yellow')
+        && data.sortOrder is int;
+    }
+
+    // Helper: Validates a Certification document
+    function isValidCertification(data) {
+      return data.keys().hasAll(['id', 'title', 'result', 'icon', 'color', 'sortOrder'])
+        && data.keys().size() <= 8
+        && data.id is string && isValidId(data.id)
+        && data.title is string && data.title.size() <= 200
+        && data.result is string && data.result.size() <= 100
+        && data.icon is string && data.icon.size() <= 100
+        && data.color is string && (data.color == 'tertiary' || data.color == 'default')
+        && data.sortOrder is int;
+    }
+
+    // Helper: Validates a PortfolioItem document
+    function isValidPortfolioItem(data) {
+      return data.keys().hasAll(['id', 'title', 'description', 'imageUrl', 'status', 'tags', 'sortOrder'])
+        && data.keys().size() <= 9
+        && data.id is string && isValidId(data.id)
+        && data.title is string && data.title.size() <= 200
+        && data.description is string && data.description.size() <= 2000
+        && data.imageUrl is string && data.imageUrl.size() <= 2000
+        && data.status is string && (data.status == 'COMPLETED' || data.status == 'IN DEVELOPMENT')
+        && data.tags is list && data.tags.size() <= 10
+        && data.sortOrder is int;
+    }
+
+    // Collection: siteContent
+    match /siteContent/{docId} {
+      allow read: if true;
+      allow write: if isValidId(docId) && isValidSiteContent(request.resource.data);
+    }
+
+    // Collection: experiences
+    match /experiences/{experienceId} {
+      allow read: if true;
+      allow write: if isValidId(experienceId) && (request.method == 'delete' || isValidExperience(request.resource.data));
+    }
+
+    // Collection: certifications
+    match /certifications/{certificationId} {
+      allow read: if true;
+      allow write: if isValidId(certificationId) && (request.method == 'delete' || isValidCertification(request.resource.data));
+    }
+
+    // Collection: portfolio
+    match /portfolio/{portfolioId} {
+      allow read: if true;
+      allow write: if isValidId(portfolioId) && (request.method == 'delete' || isValidPortfolioItem(request.resource.data));
+    }
+  }
+}
