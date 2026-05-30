@@ -179,21 +179,46 @@ export function uploadImageToStorage(
     const storageRef = ref(storage, filePath);
     
     const uploadTask = uploadBytesResumable(storageRef, file);
+    let lastBytesTransferred = 0;
+    let isFinished = false;
+
+    // Timeout trigger: if stuck at 0% for more than 2.2 seconds (likely CORS, connection, or permission issue)
+    const timeoutId = setTimeout(() => {
+      if (!isFinished && lastBytesTransferred === 0) {
+        console.warn("Storage upload stuck at 0% (possible CORS issue). Canceling and falling back to base64...");
+        try {
+          uploadTask.cancel();
+        } catch (e) {
+          if (!isFinished) {
+            isFinished = true;
+            if (onProgress) onProgress(100);
+            compressFile().then(resolve).catch(reject);
+          }
+        }
+      }
+    }, 2200);
 
     uploadTask.on(
       'state_changed',
       (snapshot) => {
+        lastBytesTransferred = snapshot.bytesTransferred;
         const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
         if (onProgress) {
           onProgress(Math.round(progress));
         }
       },
       (error) => {
+        clearTimeout(timeoutId);
+        if (isFinished) return;
+        isFinished = true;
         console.warn("Storage upload failed (CORS or config issue). Falling back to optimized Base64...", error);
         if (onProgress) onProgress(100);
         compressFile().then(resolve).catch(reject);
       },
       async () => {
+        clearTimeout(timeoutId);
+        if (isFinished) return;
+        isFinished = true;
         try {
           const downloadUrl = await getDownloadURL(uploadTask.snapshot.ref);
           resolve(downloadUrl);
