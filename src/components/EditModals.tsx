@@ -272,6 +272,83 @@ export function EditSiteContentModal({
             </div>
           </div>
 
+          <div className="border-t border-gray-100 my-4 pt-4">
+            <h4 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">테마 스타일 및 색상 설정</h4>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div>
+                <label className="block text-[11px] font-bold text-gray-700 tracking-wider mb-1">전체 배경 색상</label>
+                <div className="flex items-center space-x-1.5">
+                  <input 
+                    type="color" 
+                    value={formData.backgroundColor || '#ffffff'} 
+                    onChange={e => setFormData({ ...formData, backgroundColor: e.target.value })}
+                    className="h-8 w-8 cursor-pointer rounded border border-gray-200 p-0"
+                  />
+                  <input
+                    type="text"
+                    value={formData.backgroundColor || '#ffffff'}
+                    onChange={e => setFormData({ ...formData, backgroundColor: e.target.value })}
+                    className="w-full px-2 py-1 text-xs border border-gray-300 rounded font-mono"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-gray-700 tracking-wider mb-1">헤더 메인 타이틀</label>
+                <div className="flex items-center space-x-1.5">
+                  <input 
+                    type="color" 
+                    value={formData.titleColor || '#0052FF'} 
+                    onChange={e => setFormData({ ...formData, titleColor: e.target.value })}
+                    className="h-8 w-8 cursor-pointer rounded border border-gray-200 p-0"
+                  />
+                  <input
+                    type="text"
+                    value={formData.titleColor || '#0052FF'}
+                    onChange={e => setFormData({ ...formData, titleColor: e.target.value })}
+                    className="w-full px-2 py-1 text-xs border border-gray-300 rounded font-mono"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-gray-700 tracking-wider mb-1">일반 본문 텍스트</label>
+                <div className="flex items-center space-x-1.5">
+                  <input 
+                    type="color" 
+                    value={formData.textColor || '#434656'} 
+                    onChange={e => setFormData({ ...formData, textColor: e.target.value })}
+                    className="h-8 w-8 cursor-pointer rounded border border-gray-200 p-0"
+                  />
+                  <input
+                    type="text"
+                    value={formData.textColor || '#434656'}
+                    onChange={e => setFormData({ ...formData, textColor: e.target.value })}
+                    className="w-full px-2 py-1 text-xs border border-gray-300 rounded font-mono"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-gray-700 tracking-wider mb-1">포인트/테두리 강조</label>
+                <div className="flex items-center space-x-1.5">
+                  <input 
+                    type="color" 
+                    value={formData.accentColor || '#0052FF'} 
+                    onChange={e => setFormData({ ...formData, accentColor: e.target.value })}
+                    className="h-8 w-8 cursor-pointer rounded border border-gray-200 p-0"
+                  />
+                  <input
+                    type="text"
+                    value={formData.accentColor || '#0052FF'}
+                    onChange={e => setFormData({ ...formData, accentColor: e.target.value })}
+                    className="w-full px-2 py-1 text-xs border border-gray-300 rounded font-mono"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div className="flex justify-end space-x-3 pt-4 border-t border-gray-100">
             <button 
               type="button" 

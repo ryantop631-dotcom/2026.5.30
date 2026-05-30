@@ -332,7 +332,13 @@ export default function App() {
   };
 
   return (
-    <>
+    <div 
+      className="min-h-screen flex flex-col font-sans transition-colors duration-300"
+      style={{ 
+        backgroundColor: siteContent.backgroundColor || '#ffffff',
+        color: siteContent.textColor || '#434656'
+      }}
+    >
       {/* 🛠️ Main Admin Notification Bar */}
       {isAdminActive && (
         <AdminBar 
@@ -345,26 +351,32 @@ export default function App() {
       {/* FIXED TOP NAVIGATION BAR */}
       <nav 
         id="top-nav-bar"
-        className={`fixed w-full h-20 z-40 bg-white/90 backdrop-blur-md border-b border-gray-100 transition-all duration-300 ease-in-out ${
+        className={`fixed w-full h-20 z-40 transition-all duration-300 ease-in-out border-b border-gray-100 ${
           isAdminActive ? 'top-14' : 'top-0'
         }`}
+        style={{
+          backgroundColor: siteContent.backgroundColor ? `${siteContent.backgroundColor}e6` : 'rgba(255, 255, 255, 0.9)',
+          backdropFilter: 'blur(8px)',
+          borderBottomColor: siteContent.backgroundColor === '#ffffff' ? '#f3f4f6' : 'rgba(255, 255, 255, 0.1)'
+        }}
       >
         <div id="nav-container" className="flex justify-between items-center h-20 px-margin-mobile md:px-margin-desktop max-w-7xl mx-auto w-full">
           <a
             id="brand-logo" 
             href="#about"
-            className="font-headline font-bold text-lg md:text-xl tracking-tighter text-[#0052FF]"
+            className="font-headline font-bold text-lg md:text-xl tracking-tighter"
+            style={{ color: siteContent.titleColor || '#0052FF' }}
           >
             ROBOT CODING AREA
           </a>
 
           {/* Desktop Nav links */}
           <div className="hidden md:flex space-x-6 lg:space-x-8 items-center font-headline text-sm font-semibold">
-            <a href="#about" className="text-[#0052FF] border-b-2 border-[#0052FF] pb-1 transition-all duration-300">About</a>
-            <a href="#experience" className="text-gray-500 hover:text-[#0052FF] transition-colors pb-1">Experience</a>
-            <a href="#skills" className="text-gray-500 hover:text-[#0052FF] transition-colors pb-1">Skills</a>
-            <a href="#awards" className="text-gray-500 hover:text-[#0052FF] transition-colors pb-1">Certifications &amp; Awards</a>
-            <a href="#portfolio" className="text-gray-500 hover:text-[#0052FF] transition-colors pb-1">Portfolio</a>
+            <a href="#about" className="border-b-2 pb-1 transition-all duration-300" style={{ color: siteContent.accentColor || '#0052FF', borderBottomColor: siteContent.accentColor || '#0052FF' }}>About</a>
+            <a href="#experience" className="transition-colors pb-1" style={{ color: siteContent.textColor || '#434656' }}>Experience</a>
+            <a href="#skills" className="transition-colors pb-1" style={{ color: siteContent.textColor || '#434656' }}>Skills</a>
+            <a href="#awards" className="transition-colors pb-1" style={{ color: siteContent.textColor || '#434656' }}>Certifications &amp; Awards</a>
+            <a href="#portfolio" className="transition-colors pb-1" style={{ color: siteContent.textColor || '#434656' }}>Portfolio</a>
           </div>
 
           {/* Mobile hamburger menu toggle */}
@@ -372,7 +384,8 @@ export default function App() {
             id="mobile-nav-toggle"
             aria-label="Toggle Menu" 
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden text-[#0052FF] focus:outline-none p-1 rounded hover:bg-gray-50"
+            className="md:hidden focus:outline-none p-1 rounded hover:bg-gray-50/10"
+            style={{ color: siteContent.accentColor || '#0052FF' }}
           >
             {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -380,12 +393,14 @@ export default function App() {
 
         {/* Mobile menu dropdown */}
         {mobileMenuOpen && (
-          <div className="md:hidden absolute top-20 inset-x-0 bg-white border-b border-gray-100 p-4 shadow-xl z-30 font-headline font-semibold text-sm flex flex-col space-y-4 text-center">
-            <a href="#about" onClick={() => setMobileMenuOpen(false)} className="py-2 text-[#0052FF] bg-[#0052FF]/5 rounded">About</a>
-            <a href="#experience" onClick={() => setMobileMenuOpen(false)} className="py-2 text-gray-600 hover:text-[#0052FF] hover:bg-gray-50 rounded">Experience</a>
-            <a href="#skills" onClick={() => setMobileMenuOpen(false)} className="py-2 text-gray-600 hover:text-[#0052FF] hover:bg-gray-50 rounded">Skills</a>
-            <a href="#awards" onClick={() => setMobileMenuOpen(false)} className="py-2 text-gray-600 hover:text-[#0052FF] hover:bg-gray-50 rounded">Certifications &amp; Awards</a>
-            <a href="#portfolio" onClick={() => setMobileMenuOpen(false)} className="py-2 text-gray-600 hover:text-[#0052FF] hover:bg-gray-50 rounded">Portfolio</a>
+          <div className="md:hidden absolute top-20 inset-x-0 border-b border-gray-100 p-4 shadow-xl z-30 font-headline font-semibold text-sm flex flex-col space-y-4 text-center"
+            style={{ backgroundColor: siteContent.backgroundColor || '#ffffff', borderBottomColor: siteContent.backgroundColor === '#ffffff' ? '#e5e7eb' : 'rgba(255, 255, 255, 0.1)' }}
+          >
+            <a href="#about" onClick={() => setMobileMenuOpen(false)} className="py-2 rounded" style={{ color: siteContent.accentColor || '#0052FF', backgroundColor: `${siteContent.accentColor || '#0052FF'}1a` }}>About</a>
+            <a href="#experience" onClick={() => setMobileMenuOpen(false)} className="py-2 rounded" style={{ color: siteContent.textColor || '#434656' }}>Experience</a>
+            <a href="#skills" onClick={() => setMobileMenuOpen(false)} className="py-2 rounded" style={{ color: siteContent.textColor || '#434656' }}>Skills</a>
+            <a href="#awards" onClick={() => setMobileMenuOpen(false)} className="py-2 rounded" style={{ color: siteContent.textColor || '#434656' }}>Certifications &amp; Awards</a>
+            <a href="#portfolio" onClick={() => setMobileMenuOpen(false)} className="py-2 rounded" style={{ color: siteContent.textColor || '#434656' }}>Portfolio</a>
           </div>
         )}
       </nav>
@@ -415,29 +430,39 @@ export default function App() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-16 items-center">
                 <div className="space-y-6">
-                  <h1 className="font-headline font-bold text-4xl md:text-5xl lg:text-6xl text-[#0052FF] tracking-tighter leading-tight">
+                  <h1 className="font-headline font-bold text-4xl md:text-5xl lg:text-6xl tracking-tighter leading-tight" style={{ color: siteContent.titleColor || '#0052FF' }}>
                     {siteContent.title}
                   </h1>
-                  <h2 className="font-headline font-semibold text-lg md:text-xl text-[#434656]">
+                  <h2 className="font-headline font-semibold text-lg md:text-xl" style={{ color: siteContent.textColor || '#434656', opacity: 0.9 }}>
                     {siteContent.subtitle}
                   </h2>
-                  <p className="font-sans text-base md:text-lg text-gray-700 leading-relaxed max-w-xl">
+                  <p className="font-sans text-base md:text-lg leading-relaxed max-w-xl" style={{ color: siteContent.textColor || '#434656' }}>
                     {siteContent.description}
                   </p>
                   
                   {siteContent.missionStatement && (
-                    <div id="about-mission-statement" className="p-5 bg-[#f8f9fa] border-l-4 border-[#0052FF] rounded-r-lg mt-8 shadow-sm">
-                      <p className="font-mono text-xs text-[#0052FF] font-bold uppercase tracking-widest">
+                    <div id="about-mission-statement" className="p-5 border-l-4 rounded-r-lg mt-8 shadow-sm"
+                      style={{ 
+                        backgroundColor: siteContent.backgroundColor === '#ffffff' ? '#f8f9fa' : 'rgba(255, 255, 255, 0.05)',
+                        borderLeftColor: siteContent.accentColor || '#0052FF'
+                      }}
+                    >
+                      <p className="font-mono text-xs font-bold uppercase tracking-widest" style={{ color: siteContent.accentColor || '#0052FF' }}>
                         &gt; MISSION_STATEMENT
                       </p>
-                      <p className="font-sans text-sm md:text-base text-[#434656] mt-2 italic font-medium">
+                      <p className="font-sans text-sm md:text-base mt-2 italic font-medium" style={{ color: siteContent.textColor || '#434656' }}>
                         "{siteContent.missionStatement}"
                       </p>
                     </div>
                   )}
                 </div>
 
-                <div id="hero-img-frame" className="relative h-80 sm:h-96 w-full rounded-2xl overflow-hidden shadow-2xl border-4 border-white bg-white flex items-center justify-center">
+                <div id="hero-img-frame" className="relative h-80 sm:h-96 w-full rounded-2xl overflow-hidden shadow-2xl border-4 flex items-center justify-center"
+                  style={{ 
+                    backgroundColor: siteContent.backgroundColor === '#ffffff' ? '#ffffff' : 'rgba(255, 255, 255, 0.1)',
+                    borderColor: siteContent.backgroundColor === '#ffffff' ? '#ffffff' : 'rgba(255, 255, 255, 0.2)'
+                  }}
+                >
                   <img 
                     src={siteContent.heroImageUrl} 
                     alt="Kim Ju-won Hero Artwork Logo" 
@@ -449,13 +474,17 @@ export default function App() {
             </section>
 
             {/* EXPERIENCE SECTION */}
-            <section id="experience" className="px-margin-mobile md:px-margin-desktop max-w-7xl mx-auto py-16 border-t border-gray-100 relative group">
+            <section id="experience" className="px-margin-mobile md:px-margin-desktop max-w-7xl mx-auto py-16 border-t relative group"
+              style={{ borderTopColor: siteContent.backgroundColor === '#ffffff' ? '#f3f4f6' : 'rgba(255, 255, 255, 0.1)' }}
+            >
               <div className="flex flex-col md:flex-row md:items-end justify-between mb-10">
                 <div>
-                  <h2 className="font-headline font-bold text-2xl md:text-3xl text-[#0052FF] mb-2 border-l-4 border-[#0052FF] pl-4">
+                  <h2 className="font-headline font-bold text-2xl md:text-3xl mb-2 border-l-4 pl-4"
+                    style={{ color: siteContent.titleColor || '#0052FF', borderLeftColor: siteContent.accentColor || '#0052FF' }}
+                  >
                     Experience
                   </h2>
-                  <p className="font-sans text-sm md:text-base text-gray-500">
+                  <p className="font-sans text-sm md:text-base text-gray-400">
                     로봇 수업과 프로젝트를 통해 경험한 활동들을 정리했습니다.
                   </p>
                 </div>
@@ -467,7 +496,8 @@ export default function App() {
                       setExperienceEditTarget(null);
                       setIsExperienceModalOpen(true);
                     }}
-                    className="mt-4 md:mt-0 bg-[#0052FF] hover:bg-blue-700 text-white py-2 px-4 rounded text-xs font-semibold flex items-center space-x-1.5 shadow"
+                    className="mt-4 md:mt-0 hover:brightness-115 text-white py-2 px-4 rounded text-xs font-semibold flex items-center space-x-1.5 shadow"
+                    style={{ backgroundColor: siteContent.accentColor || '#0052FF' }}
                   >
                     <Plus size={13} />
                     <span>경험 이력 등록</span>
@@ -479,7 +509,12 @@ export default function App() {
                 {experiences.map(item => (
                   <div 
                     key={item.id}
-                    className={`bg-white p-6 md:p-8 rounded-xl neon-border border-${item.color} relative group/card cursor-pointer`}
+                    className={`p-6 md:p-8 rounded-xl neon-border relative group/card cursor-pointer`}
+                    style={{ 
+                      backgroundColor: siteContent.backgroundColor === '#ffffff' ? '#ffffff' : 'rgba(255, 255, 255, 0.06)',
+                      borderColor: item.color === 'blue' ? (siteContent.accentColor || '#0052FF') : item.color === 'red' ? '#FF3B30' : '#FFCC00',
+                      color: siteContent.textColor || '#434656'
+                    }}
                   >
                     {/* Admin hovering edit controls */}
                     {isAdminActive && (
@@ -489,7 +524,8 @@ export default function App() {
                             setExperienceEditTarget(item);
                             setIsExperienceModalOpen(true);
                           }}
-                          className="p-1.5 bg-[#0052FF] text-white rounded hover:bg-blue-700 shadow"
+                          className="p-1.5 text-white rounded shadow"
+                          style={{ backgroundColor: siteContent.accentColor || '#0052FF' }}
                           title="이력 수정"
                         >
                           <Edit2 size={11} />
@@ -498,17 +534,19 @@ export default function App() {
                     )}
 
                     <div className="flex items-start justify-between mb-4">
-                      <h3 className="font-headline font-semibold text-lg text-[#0A0A0A] leading-tight pr-6">
+                      <h3 className="font-headline font-semibold text-lg leading-tight pr-6" style={{ color: siteContent.titleColor || '#0A0A0A' }}>
                         {item.title}
                       </h3>
                       {/* Font-Material icon representations */}
-                      <span className={`material-symbols-outlined text-2xl ${
-                        item.color === 'blue' ? 'text-[#0052FF]' : item.color === 'red' ? 'text-[#FF3B30]' : 'text-[#FFCC00]'
-                      }`}>
+                      <span className={`material-symbols-outlined text-2xl`}
+                        style={{ 
+                          color: item.color === 'blue' ? (siteContent.accentColor || '#0052FF') : item.color === 'red' ? '#FF3B30' : '#FFCC00'
+                        }}
+                      >
                         {item.icon}
                       </span>
                     </div>
-                    <p className="font-sans text-sm text-[#434656] leading-relaxed">
+                    <p className="font-sans text-sm leading-relaxed" style={{ color: siteContent.textColor || '#434656' }}>
                       {item.description}
                     </p>
                   </div>
@@ -523,7 +561,7 @@ export default function App() {
             </section>
 
             {/* SKILLS SECTION */}
-            <section id="skills" className="bg-[#0052FF] text-white py-16 relative">
+            <section id="skills" className="text-white py-16 relative" style={{ backgroundColor: siteContent.accentColor || '#0052FF' }}>
               <div className="px-margin-mobile md:px-margin-desktop max-w-7xl mx-auto">
                 <div className="mb-10 text-center">
                   <h2 className="font-headline font-bold text-3xl mb-3">
@@ -560,10 +598,12 @@ export default function App() {
             <section id="awards" className="px-margin-mobile md:px-margin-desktop max-w-7xl mx-auto py-16 relative group">
               <div className="flex flex-col md:flex-row md:items-end justify-between mb-10">
                 <div>
-                  <h2 className="font-headline font-bold text-2xl md:text-3xl text-[#0052FF] mb-2 border-l-4 border-[#FF3B30] pl-4">
+                  <h2 className="font-headline font-bold text-2xl md:text-3xl mb-2 border-l-4 pl-4"
+                    style={{ color: siteContent.titleColor || '#0052FF', borderLeftColor: siteContent.accentColor || '#FF3B30' }}
+                  >
                     Certifications &amp; Awards
                   </h2>
-                  <p className="font-sans text-sm md:text-base text-gray-500">
+                  <p className="font-sans text-sm md:text-base text-gray-400">
                     제 손으로 만든 로봇이 세상 밖으로 나가 인정받은 발자국들입니다.
                   </p>
                 </div>
@@ -575,7 +615,8 @@ export default function App() {
                       setCertificationEditTarget(null);
                       setIsCertificationModalOpen(true);
                     }}
-                    className="mt-4 md:mt-0 bg-[#0052FF] hover:bg-blue-700 text-white py-2 px-4 rounded text-xs font-semibold flex items-center space-x-1.5 shadow"
+                    className="mt-4 md:mt-0 hover:brightness-115 text-white py-2 px-4 rounded text-xs font-semibold flex items-center space-x-1.5 shadow"
+                    style={{ backgroundColor: siteContent.accentColor || '#0052FF' }}
                   >
                     <Plus size={13} />
                     <span>수상/이력 필터 추가</span>
@@ -587,27 +628,35 @@ export default function App() {
                 {certifications.map(cert => (
                   <div 
                     key={cert.id}
-                    className={`bg-white p-5 md:p-6 rounded-xl relative group/cert flex items-center justify-between shadow-sm border-2 ${
-                      cert.color === 'tertiary' ? 'border-[#FFCC00]' : 'border-gray-200'
-                    }`}
+                    className={`p-5 md:p-6 rounded-xl relative group/cert flex items-center justify-between shadow-sm border-2`}
+                    style={{ 
+                      backgroundColor: siteContent.backgroundColor === '#ffffff' ? '#ffffff' : 'rgba(255, 255, 255, 0.06)',
+                      borderColor: cert.color === 'tertiary' ? '#FFCC00' : (siteContent.backgroundColor === '#ffffff' ? '#e5e7eb' : 'rgba(255, 255, 255, 0.1)'),
+                      color: siteContent.textColor || '#434656'
+                    }}
                   >
                     <div className="flex items-center space-x-4 pr-10">
-                      <div className={`w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 ${
-                        cert.color === 'tertiary' ? 'bg-[#FFCC00] text-[#0A0A0A]' : 'bg-gray-100 text-[#0052FF]'
-                      }`}>
+                      <div className={`w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0`}
+                        style={{ 
+                          backgroundColor: cert.color === 'tertiary' ? '#FFCC00' : 'rgba(120, 120, 120, 0.1)',
+                          color: cert.color === 'tertiary' ? '#0A0A0A' : (siteContent.accentColor || '#0052FF')
+                        }}
+                      >
                         <span className="material-symbols-outlined text-xl">{cert.icon}</span>
                       </div>
                       <div>
-                        <h3 className="font-headline font-bold text-sm md:text-base text-[#0A0A0A] leading-tight">
+                        <h3 className="font-headline font-bold text-sm md:text-base leading-tight" style={{ color: siteContent.titleColor || '#0A0A0A' }}>
                           {cert.title}
                         </h3>
                       </div>
                     </div>
 
                     <div className="flex items-center space-x-4">
-                      <span className={`font-headline font-black text-base md:text-lg leading-none ${
-                        cert.color === 'tertiary' ? 'text-[#FF3B30]' : 'text-gray-500'
-                      }`}>
+                      <span className={`font-headline font-black text-base md:text-lg leading-none`}
+                        style={{ 
+                          color: cert.color === 'tertiary' ? '#FF3B30' : (siteContent.textColor || '#434656')
+                        }}
+                      >
                         {cert.result}
                       </span>
                       
@@ -619,7 +668,8 @@ export default function App() {
                               setCertificationEditTarget(cert);
                               setIsCertificationModalOpen(true);
                             }}
-                            className="p-1.5 bg-[#0052FF] text-white rounded hover:bg-blue-700 shadow"
+                            className="p-1.5 text-white rounded shadow"
+                            style={{ backgroundColor: siteContent.accentColor || '#0052FF' }}
                             title="수상 이력 수정"
                           >
                             <Edit2 size={11} />
@@ -633,13 +683,17 @@ export default function App() {
             </section>
 
             {/* PORTFOLIO SECTION */}
-            <section id="portfolio" className="px-margin-mobile md:px-margin-desktop max-w-7xl mx-auto py-16 border-t border-gray-100 relative group">
+            <section id="portfolio" className="px-margin-mobile md:px-margin-desktop max-w-7xl mx-auto py-16 relative group"
+              style={{ borderTopColor: siteContent.backgroundColor === '#ffffff' ? '#f3f4f6' : 'rgba(255, 255, 255, 0.1)' }}
+            >
               <div className="flex flex-col md:flex-row md:items-end justify-between mb-10">
                 <div>
-                  <h2 className="font-headline font-bold text-2xl md:text-3xl text-[#0052FF] mb-2 border-l-4 border-[#0052FF] pl-4">
+                  <h2 className="font-headline font-bold text-2xl md:text-3xl mb-2 border-l-4 pl-4"
+                    style={{ color: siteContent.titleColor || '#0052FF', borderLeftColor: siteContent.accentColor || '#0052FF' }}
+                  >
                     Portfolio
                   </h2>
-                  <p className="font-sans text-sm md:text-base text-gray-500">
+                  <p className="font-sans text-sm md:text-base text-gray-400">
                     내 손으로 빚어낸 로봇과, 이를 움직이는 소프트웨어 코드들을 모았습니다.
                   </p>
                 </div>
@@ -651,7 +705,8 @@ export default function App() {
                       setPortfolioEditTarget(null);
                       setIsPortfolioModalOpen(true);
                     }}
-                    className="mt-4 md:mt-0 bg-[#0052FF] hover:bg-blue-700 text-white py-2 px-4 rounded text-xs font-semibold flex items-center space-x-1.5 shadow"
+                    className="mt-4 md:mt-0 hover:brightness-115 text-white py-2 px-4 rounded text-xs font-semibold flex items-center space-x-1.5 shadow"
+                    style={{ backgroundColor: siteContent.accentColor || '#0052FF' }}
                   >
                     <Plus size={13} />
                     <span>포트폴리오 등록</span>
@@ -663,9 +718,12 @@ export default function App() {
                 {portfolioItems.map(item => (
                   <div 
                     key={item.id}
-                    className={`bg-white rounded-xl overflow-hidden neon-border group/card flex flex-col h-full border-2 hover:border-${
-                      item.status === 'COMPLETED' ? 'primary' : 'secondary'
-                    } relative`}
+                    className={`rounded-xl overflow-hidden neon-border group/card flex flex-col h-full border-2 relative`}
+                    style={{ 
+                      backgroundColor: siteContent.backgroundColor === '#ffffff' ? '#ffffff' : 'rgba(255, 255, 255, 0.06)',
+                      borderColor: item.status === 'COMPLETED' ? (siteContent.accentColor || '#0052FF') : '#FF3B30',
+                      color: siteContent.textColor || '#434656'
+                    }}
                   >
                     {/* Admin edit trigger */}
                     {isAdminActive && (
@@ -675,7 +733,8 @@ export default function App() {
                             setPortfolioEditTarget(item);
                             setIsPortfolioModalOpen(true);
                           }}
-                          className="p-1.5 bg-[#0052FF] text-white rounded hover:bg-blue-700 shadow"
+                          className="p-1.5 text-white rounded shadow"
+                          style={{ backgroundColor: siteContent.accentColor || '#0052FF' }}
                           title="포트폴리오 수정"
                         >
                           <Edit2 size={11} />
@@ -694,23 +753,29 @@ export default function App() {
 
                     <div className="p-5 flex-grow flex flex-col">
                       <div className="flex items-center space-x-2 mb-2">
-                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold text-white shadow-sm ${
-                          item.status === 'COMPLETED' ? 'bg-[#0052FF]' : 'bg-[#FF3B30]'
-                        }`}>
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold text-white shadow-sm"
+                          style={{ backgroundColor: item.status === 'COMPLETED' ? (siteContent.accentColor || '#0052FF') : '#FF3B30' }}
+                        >
                           {item.status}
                         </span>
                       </div>
-                      <h3 className="font-headline font-bold text-base md:text-lg text-[#0A0A0A] mb-2">
+                      <h3 className="font-headline font-bold text-base md:text-lg mb-2" style={{ color: siteContent.titleColor || '#0A0A0A' }}>
                         {item.title}
                       </h3>
-                      <p className="font-sans text-xs md:text-sm text-[#434656] mb-4 flex-grow leading-relaxed">
+                      <p className="font-sans text-xs md:text-sm mb-4 flex-grow leading-relaxed" style={{ color: siteContent.textColor || '#434656' }}>
                         {item.description}
                       </p>
                       <div className="flex flex-wrap gap-1.5 mt-auto">
                         {item.tags.map((tag, tIndex) => (
                           <span 
                             key={tIndex}
-                            className="px-2 py-0.5 bg-gray-50 border border-gray-200 rounded text-[9px] font-mono text-gray-500"
+                            className="px-2 py-0.5 rounded text-[9px] font-mono"
+                            style={{ 
+                              backgroundColor: siteContent.backgroundColor === '#ffffff' ? '#f9fafb' : 'rgba(255, 255, 255, 0.1)',
+                              borderColor: siteContent.backgroundColor === '#ffffff' ? '#e5e7eb' : 'rgba(255, 255, 255, 0.15)',
+                              borderWidth: '1px',
+                              color: siteContent.textColor || '#434656'
+                            }}
                           >
                             {tag}
                           </span>
@@ -821,6 +886,6 @@ export default function App() {
         onDelete={handleDeletePortfolioItem}
         isFirebaseReady={isFirebaseConfigured}
       />
-    </>
+    </div>
   );
 }
