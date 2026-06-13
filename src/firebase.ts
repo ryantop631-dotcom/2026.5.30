@@ -103,7 +103,8 @@ if (db) {
 export function uploadImageToStorage(
   file: File, 
   folder: string,
-  onProgress?: (progress: number) => void
+  onProgress?: (progress: number) => void,
+  forceBase64: boolean = false
 ): Promise<string> {
   // Compression helper to convert image to under-the-limit compressed Base64 URL
   const compressFile = (): Promise<string> => {
@@ -138,7 +139,7 @@ export function uploadImageToStorage(
           
           ctx.drawImage(img, 0, 0, width, height);
           // High-efficiency JPEG compression (0.7) guarantees fits nicely inside 1MB Firestore doc limits
-          const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.65);
           resolveCompressed(dataUrl);
         };
         img.onerror = () => {
@@ -165,6 +166,22 @@ export function uploadImageToStorage(
       return;
     }
 
+    // Force base64 conversion if requested
+    if (forceBase64) {
+      console.info("Forcing optimized Base64 encoding...");
+      if (onProgress) onProgress(30);
+      setTimeout(() => {
+        if (onProgress) onProgress(70);
+        compressFile()
+          .then(url => {
+            if (onProgress) onProgress(100);
+            resolve(url);
+          })
+          .catch(reject);
+      }, 300);
+      return;
+    }
+
     // If Storage is not ready, fall back directly to compressed base64
     if (!storage) {
       console.info("Firebase Storage not available. Falling back to compressed base64...");
@@ -173,60 +190,65 @@ export function uploadImageToStorage(
     }
 
     // Try Cloud storage first
-    const timestamp = Date.now();
-    const cleanFileName = file.name.replace(/[^a-zA-Z0-9.]/g, "_");
-    const filePath = `${folder}/${timestamp}_${cleanFileName}`;
-    const storageRef = ref(storage, filePath);
-    
-    const uploadTask = uploadBytesResumable(storageRef, file);
-    let lastBytesTransferred = 0;
-    let isFinished = false;
+    try {
+      const timestamp = Date.now();
+      const cleanFileName = file.name.replace(/[^a-zA-Z0-9.]/g, "_");
+      const filePath = `${folder}/${timestamp}_${cleanFileName}`;
+      const storageRef = ref(storage, filePath);
+      
+      const uploadTask = uploadBytesResumable(storageRef, file);
+      let lastBytesTransferred = 0;
+      let isFinished = false;
 
-    // Timeout trigger: if stuck at 0% for more than 2.2 seconds (likely CORS, connection, or permission issue)
-    const timeoutId = setTimeout(() => {
-      if (!isFinished && lastBytesTransferred === 0) {
-        console.warn("Storage upload stuck at 0% (possible CORS issue). Canceling and falling back to base64...");
-        try {
-          uploadTask.cancel();
-        } catch (e) {
-          if (!isFinished) {
-            isFinished = true;
-            if (onProgress) onProgress(100);
+      // Timeout trigger: if stuck at 0% for more than 2.0 seconds (likely CORS, connection, or permission issue)
+      const timeoutId = setTimeout(() => {
+        if (!isFinished && lastBytesTransferred === 0) {
+          console.warn("Storage upload stuck at 0% (possible CORS issue). Canceling and falling back to base64...");
+          try {
+            uploadTask.cancel();
+          } catch (e) {
+            if (!isFinished) {
+              isFinished = true;
+              if (onProgress) onProgress(100);
+              compressFile().then(resolve).catch(reject);
+            }
+          }
+        }
+      }, 2000);
+
+      uploadTask.on(
+        'state_changed',
+        (snapshot) => {
+          lastBytesTransferred = snapshot.bytesTransferred;
+          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          if (onProgress) {
+            onProgress(Math.round(progress));
+          }
+        },
+        (error) => {
+          clearTimeout(timeoutId);
+          if (isFinished) return;
+          isFinished = true;
+          console.warn("Storage upload failed (CORS or config issue). Falling back to optimized Base64...", error);
+          if (onProgress) onProgress(100);
+          compressFile().then(resolve).catch(reject);
+        },
+        async () => {
+          clearTimeout(timeoutId);
+          if (isFinished) return;
+          isFinished = true;
+          try {
+            const downloadUrl = await getDownloadURL(uploadTask.snapshot.ref);
+            resolve(downloadUrl);
+          } catch (err) {
+            console.warn("Failed to retrieve image URL. Falling back to optimized Base64...", err);
             compressFile().then(resolve).catch(reject);
           }
         }
-      }
-    }, 2200);
-
-    uploadTask.on(
-      'state_changed',
-      (snapshot) => {
-        lastBytesTransferred = snapshot.bytesTransferred;
-        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        if (onProgress) {
-          onProgress(Math.round(progress));
-        }
-      },
-      (error) => {
-        clearTimeout(timeoutId);
-        if (isFinished) return;
-        isFinished = true;
-        console.warn("Storage upload failed (CORS or config issue). Falling back to optimized Base64...", error);
-        if (onProgress) onProgress(100);
-        compressFile().then(resolve).catch(reject);
-      },
-      async () => {
-        clearTimeout(timeoutId);
-        if (isFinished) return;
-        isFinished = true;
-        try {
-          const downloadUrl = await getDownloadURL(uploadTask.snapshot.ref);
-          resolve(downloadUrl);
-        } catch (err) {
-          console.warn("Failed to retrieve image URL. Falling back to optimized Base64...", err);
-          compressFile().then(resolve).catch(reject);
-        }
-      }
-    );
+      );
+    } catch (err) {
+      console.warn("Synchronous Storage upload failed. Falling back to optimized Base64...", err);
+      compressFile().then(resolve).catch(reject);
+    }
   });
 }

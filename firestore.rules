@@ -14,8 +14,8 @@ service cloud.firestore {
 
     // Helper: Validates a map represents SiteContent schema
     function isValidSiteContent(data) {
-      return data.keys().hasAll(['title', 'subtitle', 'description', 'missionStatement', 'heroImageUrl', 'skillsTitle', 'skillsSubtitle', 'skills', 'backgroundColor', 'titleColor', 'textColor', 'accentColor']) 
-        && data.keys().size() <= 15
+      return data.keys().hasAll(['title', 'subtitle', 'description', 'missionStatement', 'heroImageUrl', 'skillsTitle', 'skillsSubtitle', 'skills']) 
+        && data.keys().size() <= 10
         && data.title is string && data.title.size() <= 200
         && data.subtitle is string && data.subtitle.size() <= 200
         && data.description is string && data.description.size() <= 3000
@@ -23,11 +23,7 @@ service cloud.firestore {
         && data.heroImageUrl is string && data.heroImageUrl.size() <= 1048576
         && data.skillsTitle is string && data.skillsTitle.size() <= 200
         && data.skillsSubtitle is string && data.skillsSubtitle.size() <= 500
-        && data.skills is list && data.skills.size() <= 50
-        && data.backgroundColor is string && data.backgroundColor.size() <= 50
-        && data.titleColor is string && data.titleColor.size() <= 50
-        && data.textColor is string && data.textColor.size() <= 50
-        && data.accentColor is string && data.accentColor.size() <= 50;
+        && data.skills is list && data.skills.size() <= 50;
     }
 
     // Helper: Validates an Experience document

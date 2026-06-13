@@ -34,6 +34,7 @@ export function EditSiteContentModal({
   const [isSaving, setIsSaving] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [errorWord, setErrorWord] = useState('');
+  const [useBase64Encoding, setUseBase64Encoding] = useState(true); // Default to Base64 (Highly stable!)
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [dragActive, setDragActive] = useState(false);
@@ -51,8 +52,8 @@ export function EditSiteContentModal({
   };
 
   const handleImageFile = async (file: File) => {
-    if (!isFirebaseReady) {
-      setErrorWord("Firebase가 구성되지 않아 파일을 업로드할 수 없습니다. 대신 텍스트로 수정해 주세요.");
+    if (!isFirebaseReady && !useBase64Encoding) {
+      setErrorWord("Firebase Storage가 연동되지 않은 상태에서는 '클라우드 저장'을 사용할 수 없습니다. '로컬 1MB 최적화 압축 저장' 방식을 선택하세요.");
       return;
     }
     setErrorWord('');
@@ -60,11 +61,11 @@ export function EditSiteContentModal({
       setUploadProgress(10);
       const url = await uploadImageToStorage(file, 'banners', (progress) => {
         setUploadProgress(progress);
-      });
+      }, useBase64Encoding);
       setFormData(prev => ({ ...prev, heroImageUrl: url }));
       setUploadProgress(null);
     } catch (err: any) {
-      setErrorWord(err.message || "이미지 업로드에 실패했습니다. CORS 설정을 확인해 주세요.");
+      setErrorWord(err.message || "이미지 업로드에 실패했습니다.");
       setUploadProgress(null);
     }
   };
@@ -213,8 +214,39 @@ export function EditSiteContentModal({
             </div>
           </div>
 
-          <div className="border-t border-gray-100 my-4 pt-4">
+          <div className="border-t border-gray-100 my-4 pt-4 col-span-1 md:col-span-2">
             <label className="block text-xs font-bold text-gray-700 tracking-wider mb-2">메인 캐릭터 이미지 업로드</label>
+            
+            {/* Upload Method Radio Selector */}
+            <div className="bg-blue-50/50 p-3 rounded-lg border border-[#0052FF]/10 flex flex-col md:flex-row md:items-center justify-between mb-3 gap-2">
+              <span className="text-xs font-bold text-[#0052FF] flex items-center">
+                <span className="material-symbols-outlined text-sm mr-1">settings</span>
+                업로드 방식 설정:
+              </span>
+              <div className="flex flex-wrap gap-4">
+                <label className="flex items-center text-xs font-medium text-gray-700 cursor-pointer space-x-1.5 hover:text-[#0052FF] transition-colors">
+                  <input 
+                    type="radio" 
+                    checked={useBase64Encoding} 
+                    onChange={() => setUseBase64Encoding(true)}
+                    className="text-[#0052FF] focus:ring-[#0052FF] h-4 w-4 border-gray-300"
+                  />
+                  <span>로컬 최적화 압축 저장 (Base64 - 권장/무조건 업로드 성공 🚀)</span>
+                </label>
+                <label className={`flex items-center text-xs font-medium cursor-pointer space-x-1.5 transition-colors ${
+                  !isFirebaseReady ? 'text-gray-400 cursor-not-allowed' : 'text-gray-700 hover:text-[#0052FF]'
+                }`}>
+                  <input 
+                    type="radio" 
+                    checked={!useBase64Encoding} 
+                    disabled={!isFirebaseReady}
+                    onChange={() => setUseBase64Encoding(false)}
+                    className="text-[#0052FF] focus:ring-[#0052FF] h-4 w-4 border-gray-300 disabled:opacity-50"
+                  />
+                  <span>클라우드 서버 업로드 (Firebase Storage)</span>
+                </label>
+              </div>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
               <div className="w-full h-32 bg-gray-50 border border-gray-200 rounded-lg flex items-center justify-center overflow-hidden">
                 <img 
@@ -269,83 +301,6 @@ export function EditSiteContentModal({
                 className="w-full px-3 py-1.5 border border-gray-200 rounded text-xs select-all"
                 placeholder="https://example.com/image.png"
               />
-            </div>
-          </div>
-
-          <div className="border-t border-gray-100 my-4 pt-4">
-            <h4 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">테마 스타일 및 색상 설정</h4>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div>
-                <label className="block text-[11px] font-bold text-gray-700 tracking-wider mb-1">전체 배경 색상</label>
-                <div className="flex items-center space-x-1.5">
-                  <input 
-                    type="color" 
-                    value={formData.backgroundColor || '#ffffff'} 
-                    onChange={e => setFormData({ ...formData, backgroundColor: e.target.value })}
-                    className="h-8 w-8 cursor-pointer rounded border border-gray-200 p-0"
-                  />
-                  <input
-                    type="text"
-                    value={formData.backgroundColor || '#ffffff'}
-                    onChange={e => setFormData({ ...formData, backgroundColor: e.target.value })}
-                    className="w-full px-2 py-1 text-xs border border-gray-300 rounded font-mono"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-bold text-gray-700 tracking-wider mb-1">헤더 메인 타이틀</label>
-                <div className="flex items-center space-x-1.5">
-                  <input 
-                    type="color" 
-                    value={formData.titleColor || '#0052FF'} 
-                    onChange={e => setFormData({ ...formData, titleColor: e.target.value })}
-                    className="h-8 w-8 cursor-pointer rounded border border-gray-200 p-0"
-                  />
-                  <input
-                    type="text"
-                    value={formData.titleColor || '#0052FF'}
-                    onChange={e => setFormData({ ...formData, titleColor: e.target.value })}
-                    className="w-full px-2 py-1 text-xs border border-gray-300 rounded font-mono"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-bold text-gray-700 tracking-wider mb-1">일반 본문 텍스트</label>
-                <div className="flex items-center space-x-1.5">
-                  <input 
-                    type="color" 
-                    value={formData.textColor || '#434656'} 
-                    onChange={e => setFormData({ ...formData, textColor: e.target.value })}
-                    className="h-8 w-8 cursor-pointer rounded border border-gray-200 p-0"
-                  />
-                  <input
-                    type="text"
-                    value={formData.textColor || '#434656'}
-                    onChange={e => setFormData({ ...formData, textColor: e.target.value })}
-                    className="w-full px-2 py-1 text-xs border border-gray-300 rounded font-mono"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-bold text-gray-700 tracking-wider mb-1">포인트/테두리 강조</label>
-                <div className="flex items-center space-x-1.5">
-                  <input 
-                    type="color" 
-                    value={formData.accentColor || '#0052FF'} 
-                    onChange={e => setFormData({ ...formData, accentColor: e.target.value })}
-                    className="h-8 w-8 cursor-pointer rounded border border-gray-200 p-0"
-                  />
-                  <input
-                    type="text"
-                    value={formData.accentColor || '#0052FF'}
-                    onChange={e => setFormData({ ...formData, accentColor: e.target.value })}
-                    className="w-full px-2 py-1 text-xs border border-gray-300 rounded font-mono"
-                  />
-                </div>
-              </div>
             </div>
           </div>
 
@@ -823,6 +778,7 @@ export function EditPortfolioModal({
   const [isSaving, setIsSaving] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [errorWord, setErrorWord] = useState('');
+  const [useBase64Encoding, setUseBase64Encoding] = useState(true); // Default to Base64 (Highly stable!)
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [dragActive, setDragActive] = useState(false);
@@ -840,8 +796,8 @@ export function EditPortfolioModal({
   };
 
   const handleImageFile = async (file: File) => {
-    if (!isFirebaseReady) {
-      setErrorWord("Firebase Storage가 연동되지 않아 이미지 파일을 업로드할 수 없습니다. 대신 이미지 주소를 직접 써 놓으세요.");
+    if (!isFirebaseReady && !useBase64Encoding) {
+      setErrorWord("Firebase Storage가 연동되지 않은 상태에서는 '클라우드 저장'을 사용할 수 없습니다. '로컬 1MB 최적화 압축 저장' 방식을 선택하세요.");
       return;
     }
     setErrorWord('');
@@ -849,11 +805,11 @@ export function EditPortfolioModal({
       setUploadProgress(10);
       const url = await uploadImageToStorage(file, 'portfolio', (progress) => {
         setUploadProgress(progress);
-      });
+      }, useBase64Encoding);
       setFormData(prev => ({ ...prev, imageUrl: url }));
       setUploadProgress(null);
     } catch (err: any) {
-      setErrorWord(err.message || "이미지 업로드에 실패했습니다. CORS 세팅이나 버킷을 검사해 주세요.");
+      setErrorWord(err.message || "이미지 업로드에 실패했습니다.");
       setUploadProgress(null);
     }
   };
@@ -1001,8 +957,39 @@ export function EditPortfolioModal({
             </div>
           </div>
 
-          <div className="border-t border-gray-100 my-4 pt-4">
+          <div className="border-t border-gray-100 my-4 pt-4 col-span-1 md:col-span-2">
             <label className="block text-xs font-bold text-gray-700 tracking-wider mb-2">대표작 로봇 그래픽 업로드</label>
+
+            {/* Upload Method Radio Selector */}
+            <div className="bg-blue-50/50 p-3 rounded-lg border border-[#0052FF]/10 flex flex-col md:flex-row md:items-center justify-between mb-3 gap-2">
+              <span className="text-xs font-bold text-[#0052FF] flex items-center">
+                <span className="material-symbols-outlined text-sm mr-1">settings</span>
+                업로드 방식 설정:
+              </span>
+              <div className="flex flex-wrap gap-4">
+                <label className="flex items-center text-xs font-medium text-gray-700 cursor-pointer space-x-1.5 hover:text-[#0052FF] transition-colors">
+                  <input 
+                    type="radio" 
+                    checked={useBase64Encoding} 
+                    onChange={() => setUseBase64Encoding(true)}
+                    className="text-[#0052FF] focus:ring-[#0052FF] h-4 w-4 border-gray-300"
+                  />
+                  <span>로컬 최적화 압축 저장 (Base64 - 권장/무조건 업로드 성공 🚀)</span>
+                </label>
+                <label className={`flex items-center text-xs font-medium cursor-pointer space-x-1.5 transition-colors ${
+                  !isFirebaseReady ? 'text-gray-400 cursor-not-allowed' : 'text-gray-700 hover:text-[#0052FF]'
+                }`}>
+                  <input 
+                    type="radio" 
+                    checked={!useBase64Encoding} 
+                    disabled={!isFirebaseReady}
+                    onChange={() => setUseBase64Encoding(false)}
+                    className="text-[#0052FF] focus:ring-[#0052FF] h-4 w-4 border-gray-300 disabled:opacity-50"
+                  />
+                  <span>클라우드 서버 업로드 (Firebase Storage)</span>
+                </label>
+              </div>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
               <div className="w-full h-32 bg-gray-50 border border-gray-200 rounded-lg flex items-center justify-center overflow-hidden">
                 <img 

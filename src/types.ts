@@ -11,10 +11,6 @@ export interface SiteContent {
   skillsTitle: string;
   skillsSubtitle: string;
   skills: string[];
-  backgroundColor: string;
-  titleColor: string;
-  textColor: string;
-  accentColor: string;
 }
 
 export interface Experience {

@@ -17,11 +17,7 @@ export const defaultSiteContent: SiteContent = {
     "Teamwork",
     "PPT Presentation",
     "Instruction Making"
-  ],
-  backgroundColor: "#ffffff",
-  titleColor: "#0052FF",
-  textColor: "#434656",
-  accentColor: "#0052FF"
+  ]
 };
 
 export const defaultExperiences: Experience[] = [
