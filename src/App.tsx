@@ -428,9 +428,14 @@ export default function App() {
           <a
             id="brand-logo" 
             href="#about"
-            className="font-headline font-bold text-lg md:text-xl tracking-tighter text-[#0052FF]"
+            className="font-headline font-bold text-lg md:text-xl tracking-tighter text-[#0052FF] flex items-center space-x-2.5"
           >
-            ROBOT CODING AREA
+            <img 
+              src="/favicon.png?v=3" 
+              alt="Logo" 
+              className="w-7 h-7 rounded-full border border-blue-200 object-contain shadow-xs bg-white"
+            />
+            <span>ROBOT CODING AREA</span>
           </a>
 
           {/* Desktop Nav links */}
