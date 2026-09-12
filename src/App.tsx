@@ -889,39 +889,48 @@ export default function App() {
         isFirebaseReady={isFirebaseConfigured}
       />
 
-      <EditExperienceModal 
-        isOpen={isExperienceModalOpen}
-        onClose={() => {
-          setIsExperienceModalOpen(false);
-          setExperienceEditTarget(null);
-        }}
-        experience={experienceEditTarget}
-        onSave={handleSaveExperience}
-        onDelete={handleDeleteExperience}
-      />
+      {isExperienceModalOpen && (
+        <EditExperienceModal 
+          key={experienceEditTarget ? `exp-${experienceEditTarget.id}` : 'new-exp'}
+          isOpen={isExperienceModalOpen}
+          onClose={() => {
+            setIsExperienceModalOpen(false);
+            setExperienceEditTarget(null);
+          }}
+          experience={experienceEditTarget}
+          onSave={handleSaveExperience}
+          onDelete={handleDeleteExperience}
+        />
+      )}
 
-      <EditCertificationModal 
-        isOpen={isCertificationModalOpen}
-        onClose={() => {
-          setIsCertificationModalOpen(false);
-          setCertificationEditTarget(null);
-        }}
-        certification={certificationEditTarget}
-        onSave={handleSaveCertification}
-        onDelete={handleDeleteCertification}
-      />
+      {isCertificationModalOpen && (
+        <EditCertificationModal 
+          key={certificationEditTarget ? `cert-${certificationEditTarget.id}` : 'new-cert'}
+          isOpen={isCertificationModalOpen}
+          onClose={() => {
+            setIsCertificationModalOpen(false);
+            setCertificationEditTarget(null);
+          }}
+          certification={certificationEditTarget}
+          onSave={handleSaveCertification}
+          onDelete={handleDeleteCertification}
+        />
+      )}
 
-      <EditPortfolioModal 
-        isOpen={isPortfolioModalOpen}
-        onClose={() => {
-          setIsPortfolioModalOpen(false);
-          setPortfolioEditTarget(null);
-        }}
-        portfolioItem={portfolioEditTarget}
-        onSave={handleSavePortfolioItem}
-        onDelete={handleDeletePortfolioItem}
-        isFirebaseReady={isFirebaseConfigured}
-      />
+      {isPortfolioModalOpen && (
+        <EditPortfolioModal 
+          key={portfolioEditTarget ? `port-${portfolioEditTarget.id}` : 'create-portfolio-modal'}
+          isOpen={isPortfolioModalOpen}
+          onClose={() => {
+            setIsPortfolioModalOpen(false);
+            setPortfolioEditTarget(null);
+          }}
+          portfolioItem={portfolioEditTarget}
+          onSave={handleSavePortfolioItem}
+          onDelete={handleDeletePortfolioItem}
+          isFirebaseReady={isFirebaseConfigured}
+        />
+      )}
     </div>
   );
 }

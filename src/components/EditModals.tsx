@@ -340,6 +340,7 @@ export function EditSiteContentModal({
 // 2. EXPERIENCE CARD MODAL (Add/Edit)
 // ==========================================
 interface EditExperienceModalProps {
+  key?: React.Key;
   isOpen: boolean;
   onClose: () => void;
   experience: Experience | null; // null represents "Add mode"
@@ -598,6 +599,7 @@ export function EditExperienceModal({
 // 3. CERTIFICATION & AWARD MODAL (Add/Edit)
 // ==========================================
 interface EditCertificationModalProps {
+  key?: React.Key;
   isOpen: boolean;
   onClose: () => void;
   certification: Certification | null;
@@ -829,6 +831,7 @@ export function EditCertificationModal({
 // 4. PORTFOLIO ITEM MODAL (Add/Edit)
 // ==========================================
 interface EditPortfolioModalProps {
+  key?: React.Key;
   isOpen: boolean;
   onClose: () => void;
   portfolioItem: PortfolioItem | null;
@@ -836,6 +839,16 @@ interface EditPortfolioModalProps {
   onDelete?: (id: string) => Promise<void>;
   isFirebaseReady: boolean;
 }
+
+const createEmptyPortfolioItem = (): PortfolioItem => ({
+  id: `port-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+  title: '',
+  description: '',
+  imageUrl: 'https://picsum.photos/seed/cyber/600/400',
+  status: 'COMPLETED',
+  tags: [],
+  sortOrder: 1
+});
 
 export function EditPortfolioModal({
   isOpen,
@@ -846,19 +859,11 @@ export function EditPortfolioModal({
   isFirebaseReady
 }: EditPortfolioModalProps) {
   const isCreateMode = !portfolioItem;
-  const [formData, setFormData] = useState<PortfolioItem>(
-    portfolioItem || {
-      id: `port-${Date.now()}`,
-      title: '',
-      description: '',
-      imageUrl: 'https://picsum.photos/seed/cyber/600/400',
-      status: 'COMPLETED',
-      tags: [],
-      sortOrder: 5
-    }
+  const [formData, setFormData] = useState<PortfolioItem>(() => 
+    portfolioItem ? { ...portfolioItem } : createEmptyPortfolioItem()
   );
   
-  const [tagsInput, setTagsInput] = useState<string>(
+  const [tagsInput, setTagsInput] = useState<string>(() => 
     portfolioItem ? portfolioItem.tags.join(', ') : ''
   );
   const [isSaving, setIsSaving] = useState(false);
@@ -872,20 +877,16 @@ export function EditPortfolioModal({
 
   React.useEffect(() => {
     if (isOpen) {
-      setFormData(
-        portfolioItem || {
-          id: `port-${Date.now()}`,
-          title: '',
-          description: '',
-          imageUrl: 'https://picsum.photos/seed/cyber/600/400',
-          status: 'COMPLETED',
-          tags: [],
-          sortOrder: 5
-        }
-      );
-      setTagsInput(portfolioItem ? portfolioItem.tags.join(', ') : '');
+      if (portfolioItem) {
+        setFormData({ ...portfolioItem });
+        setTagsInput(portfolioItem.tags ? portfolioItem.tags.join(', ') : '');
+      } else {
+        setFormData(createEmptyPortfolioItem());
+        setTagsInput('');
+      }
       setErrorWord('');
       setShowDeleteConfirm(false);
+      setUploadProgress(null);
     }
   }, [portfolioItem, isOpen]);
 
@@ -954,6 +955,8 @@ export function EditPortfolioModal({
 
     try {
       await onSave(updatedItem);
+      setFormData(createEmptyPortfolioItem());
+      setTagsInput('');
       onClose();
     } catch (err: any) {
       setErrorWord(err.message || "오류가 발생해 데이터를 저장할 수 없습니다.");
@@ -969,6 +972,8 @@ export function EditPortfolioModal({
     setErrorWord('');
     try {
       await onDelete(portfolioItem.id);
+      setFormData(createEmptyPortfolioItem());
+      setTagsInput('');
       onClose();
     } catch (err: any) {
       setErrorWord(err.message || "삭제 실패했습니다.");
@@ -988,9 +993,24 @@ export function EditPortfolioModal({
           <X size={20} />
         </button>
 
-        <h3 className="font-headline-sm text-lg font-bold text-[#0A0A0A] mb-1">
-          {isCreateMode ? "새 포트폴리오 프로젝트 등록자" : "포트폴리오 카드 세부 정보 편집"}
-        </h3>
+        <div className="flex items-center justify-between mb-1 pr-8">
+          <h3 className="font-headline-sm text-lg font-bold text-[#0A0A0A]">
+            {isCreateMode ? "새 포트폴리오 프로젝트 등록" : "포트폴리오 카드 세부 정보 편집"}
+          </h3>
+          {isCreateMode && (
+            <button
+              type="button"
+              onClick={() => {
+                setFormData(createEmptyPortfolioItem());
+                setTagsInput('');
+                setErrorWord('');
+              }}
+              className="text-xs text-[#0052FF] hover:underline font-semibold"
+            >
+              새 양식으로 비우기
+            </button>
+          )}
+        </div>
         <p className="text-xs text-gray-500 mb-5">로봇 이미지, 태그 정보, 개발 진척 상태를 자연스럽게 수정합니다.</p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
