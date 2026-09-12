@@ -162,7 +162,7 @@ export default function App() {
     // 2. Subscribe to experiences collection
     const unsubExperiences = onSnapshot(collection(db, 'experiences'), (snap) => {
       if (!snap.empty) {
-        const items = snap.docs.map(d => d.data() as Experience);
+        const items = snap.docs.map(d => ({ ...d.data(), id: d.id } as Experience));
         items.sort((a, b) => (a.sortOrder || 1) - (b.sortOrder || 1));
         setExperiences(items);
       } else {
@@ -183,7 +183,7 @@ export default function App() {
     // 3. Subscribe to certifications collection
     const unsubCertifications = onSnapshot(collection(db, 'certifications'), (snap) => {
       if (!snap.empty) {
-        const items = snap.docs.map(d => d.data() as Certification);
+        const items = snap.docs.map(d => ({ ...d.data(), id: d.id } as Certification));
         items.sort((a, b) => (a.sortOrder || 1) - (b.sortOrder || 1));
         setCertifications(items);
       } else {
@@ -203,11 +203,57 @@ export default function App() {
     // 4. Subscribe to portfolio collection
     const unsubPortfolio = onSnapshot(collection(db, 'portfolio'), (snap) => {
       if (!snap.empty) {
-        const items = snap.docs.map(d => d.data() as PortfolioItem);
+        const items = snap.docs.map(d => ({ ...d.data(), id: d.id } as PortfolioItem));
+        
+        // Auto-delete clock documents from Firestore if anyone uploaded them
+        snap.docs.forEach(d => {
+          const data = d.data() as PortfolioItem;
+          const isClock = 
+            data.title?.toLowerCase().includes('clock') || 
+            data.title?.toLowerCase().includes('watch') || 
+            data.title?.toLowerCase().includes('시계') || 
+            data.description?.toLowerCase().includes('clock') || 
+            data.description?.toLowerCase().includes('watch') || 
+            data.description?.toLowerCase().includes('시계');
+          if (isClock) {
+            deleteDoc(doc(db, 'portfolio', d.id)).catch(e => console.warn("Failed to delete clock:", e));
+          }
+        });
+
         items.sort((a, b) => (a.sortOrder || 1) - (b.sortOrder || 1));
-        setPortfolioItems(items);
+        
+        const filteredItems = items.filter(item => {
+          const isClock = 
+            item.title?.toLowerCase().includes('clock') || 
+            item.title?.toLowerCase().includes('watch') || 
+            item.title?.toLowerCase().includes('시계') || 
+            item.description?.toLowerCase().includes('clock') || 
+            item.description?.toLowerCase().includes('watch') || 
+            item.description?.toLowerCase().includes('시계') ||
+            item.tags?.some(tag => {
+              const t = tag.toLowerCase();
+              return t.includes('clock') || t.includes('watch') || t.includes('시계');
+            });
+          return !isClock;
+        });
+
+        setPortfolioItems(filteredItems);
       } else {
-        setPortfolioItems(defaultPortfolioItems);
+        const filteredDefaults = defaultPortfolioItems.filter(item => {
+          const isClock = 
+            item.title?.toLowerCase().includes('clock') || 
+            item.title?.toLowerCase().includes('watch') || 
+            item.title?.toLowerCase().includes('시계') || 
+            item.description?.toLowerCase().includes('clock') || 
+            item.description?.toLowerCase().includes('watch') || 
+            item.description?.toLowerCase().includes('시계') ||
+            item.tags?.some(tag => {
+              const t = tag.toLowerCase();
+              return t.includes('clock') || t.includes('watch') || t.includes('시계');
+            });
+          return !isClock;
+        });
+        setPortfolioItems(filteredDefaults);
         defaultPortfolioItems.forEach(item => {
           setDoc(doc(db, 'portfolio', item.id), item).catch(e => console.warn(e));
         });
@@ -700,7 +746,22 @@ export default function App() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {portfolioItems.map(item => (
+                {portfolioItems
+                  .filter(item => {
+                    const isClock = 
+                      item.title?.toLowerCase().includes('clock') || 
+                      item.title?.toLowerCase().includes('watch') || 
+                      item.title?.toLowerCase().includes('시계') || 
+                      item.description?.toLowerCase().includes('clock') || 
+                      item.description?.toLowerCase().includes('watch') || 
+                      item.description?.toLowerCase().includes('시계') ||
+                      item.tags?.some(tag => {
+                        const t = tag.toLowerCase();
+                        return t.includes('clock') || t.includes('watch') || t.includes('시계');
+                      });
+                    return !isClock;
+                  })
+                  .map(item => (
                   <div 
                     key={item.id}
                     className={`bg-white rounded-xl overflow-hidden neon-border group/card flex flex-col h-full border-2 relative ${

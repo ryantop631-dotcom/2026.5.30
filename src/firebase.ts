@@ -168,23 +168,18 @@ export function uploadImageToStorage(
 
     // Force base64 conversion if requested
     if (forceBase64) {
-      console.info("Forcing optimized Base64 encoding...");
-      if (onProgress) onProgress(30);
-      setTimeout(() => {
-        if (onProgress) onProgress(70);
-        compressFile()
-          .then(url => {
-            if (onProgress) onProgress(100);
-            resolve(url);
-          })
-          .catch(reject);
-      }, 300);
+      if (onProgress) onProgress(40);
+      compressFile()
+        .then(url => {
+          if (onProgress) onProgress(100);
+          resolve(url);
+        })
+        .catch(reject);
       return;
     }
 
     // If Storage is not ready, fall back directly to compressed base64
     if (!storage) {
-      console.info("Firebase Storage not available. Falling back to compressed base64...");
       compressFile().then(resolve).catch(reject);
       return;
     }
