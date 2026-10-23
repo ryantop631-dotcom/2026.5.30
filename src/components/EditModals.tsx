@@ -536,38 +536,17 @@ export function EditExperienceModal({
           <div className="flex justify-between items-center pt-4 border-t border-gray-100">
             <div>
               {!isCreateMode && onDelete && (
-                showDeleteConfirm ? (
-                  <div className="flex items-center space-x-1.5 p-1 px-2 border border-red-200 bg-red-50/50 rounded-lg animate-scale-up">
-                    <span className="text-[11px] font-bold text-[#FF3B30] mr-1.5">이 이력을 정말 삭제할까요?</span>
-                    <button
-                      type="button"
-                      onClick={handleDelete}
-                      className="text-[10px] bg-[#FF3B30] text-white px-2 py-0.5 rounded font-bold hover:bg-red-700 transition-colors"
-                      disabled={isSaving}
-                    >
-                      삭제
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setShowDeleteConfirm(false)}
-                      className="text-[10px] bg-gray-150 text-gray-700 px-2 py-0.5 rounded font-bold hover:bg-gray-250 transition-colors"
-                      disabled={isSaving}
-                    >
-                      취소
-                    </button>
-                  </div>
-                ) : (
-                  <button
-                    id="delete-experience-record"
-                    type="button"
-                    onClick={() => setShowDeleteConfirm(true)}
-                    className="flex items-center space-x-1.5 py-2 px-3 text-xs font-semibold text-[#FF3B30] hover:bg-red-50 rounded transition-colors"
-                    disabled={isSaving}
-                  >
-                    <Trash2 size={13} />
-                    <span>이 이력 삭제</span>
-                  </button>
-                )
+                <button
+                  id="delete-experience-record"
+                  type="button"
+                  onClick={handleDelete}
+                  className="flex items-center space-x-1.5 py-2 px-3 text-xs font-semibold text-[#FF3B30] hover:bg-red-50 dark:hover:bg-red-950/40 rounded transition-colors cursor-pointer"
+                  disabled={isSaving}
+                  title="삭제 확인 창 열기"
+                >
+                  <Trash2 size={13} />
+                  <span>이 이력 삭제</span>
+                </button>
               )}
             </div>
             <div className="flex space-x-2">
@@ -769,37 +748,17 @@ export function EditCertificationModal({
           <div className="flex justify-between items-center pt-4 border-t border-gray-100">
             <div>
               {!isCreateMode && onDelete && (
-                showDeleteConfirm ? (
-                  <div className="flex items-center space-x-1.5 p-1 px-2 border border-red-200 bg-red-50/50 rounded-lg animate-scale-up">
-                    <span className="text-[11px] font-bold text-[#FF3B30] mr-1.5">이 이력을 정말 삭제할까요?</span>
-                    <button
-                      type="button"
-                      onClick={handleDelete}
-                      className="text-[10px] bg-[#FF3B30] text-white px-2 py-0.5 rounded font-bold hover:bg-red-700 transition-colors"
-                      disabled={isSaving}
-                    >
-                      삭제
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setShowDeleteConfirm(false)}
-                      className="text-[10px] bg-gray-150 text-gray-700 px-2 py-0.5 rounded font-bold hover:bg-gray-250 transition-colors"
-                      disabled={isSaving}
-                    >
-                      취소
-                    </button>
-                  </div>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => setShowDeleteConfirm(true)}
-                    className="flex items-center space-x-1.5 py-2 px-3 text-xs font-semibold text-[#FF3B30] hover:bg-red-50 rounded transition-colors"
-                    disabled={isSaving}
-                  >
-                    <Trash2 size={13} />
-                    <span>이 이력 삭제</span>
-                  </button>
-                )
+                <button
+                  id="delete-certification-record"
+                  type="button"
+                  onClick={handleDelete}
+                  className="flex items-center space-x-1.5 py-2 px-3 text-xs font-semibold text-[#FF3B30] hover:bg-red-50 dark:hover:bg-red-950/40 rounded transition-colors cursor-pointer"
+                  disabled={isSaving}
+                  title="삭제 확인 창 열기"
+                >
+                  <Trash2 size={13} />
+                  <span>이 수상/인증 기록 삭제</span>
+                </button>
               )}
             </div>
             <div className="flex space-x-2">
@@ -1175,37 +1134,17 @@ export function EditPortfolioModal({
           <div className="flex justify-between items-center pt-4 border-t border-gray-100">
             <div>
               {!isCreateMode && onDelete && (
-                showDeleteConfirm ? (
-                  <div className="flex items-center space-x-1.5 p-1 px-2 border border-red-200 bg-red-50/50 rounded-lg animate-scale-up">
-                    <span className="text-[11px] font-bold text-[#FF3B30] mr-1.5">이 프로젝트를 정말 삭제할까요?</span>
-                    <button
-                      type="button"
-                      onClick={handleDelete}
-                      className="text-[10px] bg-[#FF3B30] text-white px-2 py-0.5 rounded font-bold hover:bg-red-700 transition-colors"
-                      disabled={isSaving}
-                    >
-                      삭제
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setShowDeleteConfirm(false)}
-                      className="text-[10px] bg-gray-150 text-gray-700 px-2 py-0.5 rounded font-bold hover:bg-gray-250 transition-colors"
-                      disabled={isSaving}
-                    >
-                      취소
-                    </button>
-                  </div>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => setShowDeleteConfirm(true)}
-                    className="flex items-center space-x-1.5 py-2 px-3 text-xs font-semibold text-[#FF3B30] hover:bg-red-50 rounded transition-colors"
-                    disabled={isSaving}
-                  >
-                    <Trash2 size={13} />
-                    <span>이 프로젝트 전면 삭제</span>
-                  </button>
-                )
+                <button
+                  id="delete-portfolio-record"
+                  type="button"
+                  onClick={handleDelete}
+                  className="flex items-center space-x-1.5 py-2 px-3 text-xs font-semibold text-[#FF3B30] hover:bg-red-50 dark:hover:bg-red-950/40 rounded transition-colors cursor-pointer"
+                  disabled={isSaving}
+                  title="삭제 확인 창 열기"
+                >
+                  <Trash2 size={13} />
+                  <span>이 프로젝트 삭제</span>
+                </button>
               )}
             </div>
             <div className="flex space-x-2">
