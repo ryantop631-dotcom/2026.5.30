@@ -326,7 +326,7 @@ export default function AdminPage({
                 </span>
               </div>
               <p className="text-[11px] text-gray-400 font-mono">
-                {lang === 'ko' ? '관리자 계정: rlarlawndnjs1234' : 'Logged in as: rlarlawndnjs1234'}
+                {lang === 'ko' ? '관리자 인증 완료 (최고 관리자)' : 'Administrator Authenticated (Super Admin)'}
               </p>
             </div>
           </div>

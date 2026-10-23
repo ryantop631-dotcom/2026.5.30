@@ -209,27 +209,31 @@ export default function App() {
   // -------------------------------------------------------------
   // ROUTING & ADMIN VIEW STATE (/ and /admin)
   // -------------------------------------------------------------
-  const [adminViewMode, setAdminViewMode] = useState<'inline' | 'dashboard'>('inline');
+  const [adminViewMode, setAdminViewMode] = useState<'inline' | 'dashboard'>('dashboard');
+
+  const checkIsAdminPath = (): boolean => {
+    if (typeof window === 'undefined') return false;
+    const p = window.location.pathname.toLowerCase().replace(/\/$/, '') || '/';
+    const h = window.location.hash.toLowerCase();
+    const s = new URLSearchParams(window.location.search);
+    return (
+      p === '/admin' || 
+      p.endsWith('/admin') || 
+      h === '#/admin' || 
+      h === '#admin' || 
+      s.get('page') === 'admin' || 
+      s.get('view') === 'admin' ||
+      s.get('admin') === 'true'
+    );
+  };
+
   const [currentPath, setCurrentPath] = useState<string>(() => {
-    if (typeof window !== 'undefined') {
-      const p = window.location.pathname;
-      const h = window.location.hash;
-      if (p === '/admin' || h === '#/admin' || h === '#admin') {
-        return '/admin';
-      }
-    }
-    return '/';
+    return checkIsAdminPath() ? '/admin' : '/';
   });
 
   useEffect(() => {
     const handleLocationChange = () => {
-      const p = window.location.pathname;
-      const h = window.location.hash;
-      if (p === '/admin' || h === '#/admin' || h === '#admin') {
-        setCurrentPath('/admin');
-      } else {
-        setCurrentPath('/');
-      }
+      setCurrentPath(checkIsAdminPath() ? '/admin' : '/');
     };
 
     window.addEventListener('popstate', handleLocationChange);
@@ -643,7 +647,7 @@ export default function App() {
   // Shows login screen if unauthenticated, or dashboard if dashboard view mode is explicitly toggled.
   // When logged in, default view mode is 'inline' which lets the admin use all previous admin features!
   // -------------------------------------------------------------
-  if (currentPath === '/admin' && (!isAdminActive || adminViewMode === 'dashboard')) {
+  if (currentPath === '/admin') {
     return (
       <div className="min-h-screen bg-white dark:bg-[#080D1A] text-[#434656] dark:text-slate-200">
         <AdminPage 
@@ -651,11 +655,7 @@ export default function App() {
           onLoginSuccess={enterAdminMode}
           onLogout={exitAdminMode}
           onNavigateHome={() => {
-            if (isAdminActive) {
-              setAdminViewMode('inline');
-            } else {
-              navigateTo('/');
-            }
+            navigateTo('/');
           }}
           isFirebaseConfigured={isFirebaseConfigured}
           siteContent={siteContent}
